@@ -1,6 +1,4 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/tommzn/recipeboard-core.svg)](https://pkg.go.dev/github.com/tommzn/recipemanager-lambda)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tommzn/recipemanager-lambda)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/tommzn/recipemanager-lambda)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tommzn/recipemanager-lambda)](https://goreportcard.com/report/github.com/tommzn/recipemanager-lambda)
 
 # Recipe Board - Lambda Recipe Manager
