@@ -1,0 +1,148 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: UTTE API
+  description: Recipe Manager API
+  license:
+    name: MIT
+
+paths:
+  /recipes:
+    post: 
+      summary: Create a new recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/NewRecipe'
+      responses:
+        '200':
+          description: Recipe has been created.
+          content:
+            application/json:
+             schema: 
+              $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Failed to create recipe.
+    get:
+      summary: List recipes by type.
+      parameters:
+        - in: query
+          name: recipetype
+          schema:
+            type: string
+            enum: [cooking, baking]
+          description: Type of a recipe.
+      responses:
+        '200':
+          description: Returns list of all available recipes.
+          content:
+            application/json:
+             schema: 
+              $ref: '#/components/schemas/RecipeList'
+        '400':
+          description: Something went wrong.
+        '404':
+          description: There are no recipes for passed type.
+  
+  /recipes/{id}:
+    put: 
+      summary: Update an existing recipe.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Id of a recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: 
+              $ref: '#/components/schemas/Recipe'
+      responses:
+        '200':
+          description: REcipe has been updates.
+          content:
+            application/json:
+             schema: 
+              $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Failed to update recipe.
+    get: 
+      summary: Get a single recipe.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+          description: Id of a recipe.
+      responses:
+        '200':
+          description: Returns the recipe.
+          content:
+            application/json:
+             schema: 
+              $ref: '#/components/schemas/Recipe'
+        '400':
+          description: Something went wrong.
+        '404':
+          description: There is no recipe for passed id.
+
+components:
+  schemas:
+    Recipe:
+      type: object
+      required:
+        - id
+        - type
+        - title
+      properties:
+        id:
+          description: Identifier of a recipe.
+          type: string
+        type:
+          description: Type of a recipe.
+          type: string
+          enum: [cooking, baking]
+        title:
+          description: Tile of a recipe.
+          type: string
+        ingredients:
+          description: List of recipe ingredients.
+          type: string
+        description:
+          description: Insructions to prepare a meal or cake.
+          type: string
+        createdat:
+          description: Date and time a recipe has been created.
+          type: string
+          format: date-time
+
+    NewRecipe:
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          description: Type of a recipe.
+          type: string
+          enum: [cooking, baking]
+        title:
+          description: Tile of a recipe.
+          type: string
+        ingredients:
+          description: List of recipe ingredients.
+          type: string
+        description:
+          description: Insructions to prepare a meal or cake.
+          type: string
+
+    RecipeList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Recipe'

@@ -1,0 +1,12 @@
+
+log:
+  type: local
+  loglevel: debug
+  namespace: recipemanager-lambda
+  batchsize: 5
+  
+aws:
+  dynamodb:
+    region: eu-west-5
+    tablename: DynamoDbTestTable
+    endpoint: http://localhost:8000

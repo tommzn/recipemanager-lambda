@@ -1,0 +1,84 @@
+Parameters:
+  FunctionName:
+    Description: Lambda function name.
+    Type: String
+    Default: RecipeMananger
+  ImageUri:
+    Description: Docker image location with function code.
+    Type: String
+  DynamoDbTableArn:
+    Description: Arn ofr DynamoDb backend table.
+    Type: String
+
+Resources:
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      LogGroupName: !Join 
+        - ''
+        - - '/aws/lambda/'
+          - !Ref FunctionName
+      RetentionInDays: 3
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties: 
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "lambda.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Description: String
+      Path: "/service-role/"
+
+  LambdaExecutionPolicy:
+    Type: AWS::IAM::Policy
+    DependsOn:
+      - LogGroup
+    DependsOn:
+      - LambdaExecutionRole
+    Properties: 
+      PolicyName: "LambdaRecipeManagerPolicy"  
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:BatchGetItem
+              - dynamodb:BatchWriteItem
+              - dynamodb:PutItem
+              - dynamodb:DeleteItem
+              - dynamodb:GetItem
+              - dynamodb:Scan
+              - dynamodb:Query
+              - dynamodb:UpdateItem
+            Resource:  !Ref DynamoDbTableArn
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: !GetAtt
+              - LogGroup
+              - Arn
+      Roles: 
+      - !Ref "LambdaExecutionRole"
+  
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: 
+      - LambdaExecutionRole
+    Properties: 
+      Code: 
+        ImageUri: !Ref ImageUri
+      Description: "Recipe Manager"
+      FunctionName: !Ref FunctionName
+      MemorySize: 128
+      Role: !GetAtt 
+        - LambdaExecutionRole
+        - Arn
+      PackageType: Image
+      Timeout: 10

@@ -1,0 +1,409 @@
+Parameters:
+  FunctionName:
+    Description: Lambda function name.
+    Type: String
+    Default: RecipeMananger
+  FunctionArn:
+    Description: Arn for used Lambda function.
+    Type: String
+  APIKey:
+    Description: API key for API Gateway.
+    Type: String
+  StageName: 
+    Description: Stage name for API deployment.
+    Type: String
+    Default: v1
+  SourceIp: 
+    Description: Source IP for API policy.
+    Type: String
+
+Resources:
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: "Recipe Manager API"
+      Policy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: 
+              - execute-api:Invoke
+            Resource: !Join 
+              - ""
+              - - "arn:aws:execute-api:"
+                - !Ref "AWS::Region"
+                - ":"
+                - "*:*/*"
+            Condition: 
+              IpAddress:
+                aws:SourceIp: !Ref "SourceIp"
+
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - RestApi
+    Properties: 
+      Action: "lambda:invokeFunction"
+      FunctionName: !Ref FunctionArn
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Join 
+        - ""
+        - - "arn:aws:execute-api:"
+          - !Ref "AWS::Region"
+          - ":"
+          - !Ref "AWS::AccountId"
+          - ":"
+          - !Ref "RestApi"
+          - "/*"
+
+  RecipesResource:
+    Type: AWS::ApiGateway::Resource
+    DependsOn:
+      - RestApi
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ParentId: !GetAtt 
+        - "RestApi"
+        - "RootResourceId"
+      PathPart: "recipes"
+  
+  RecipeResource:
+    Type: AWS::ApiGateway::Resource
+    DependsOn:
+      - RestApi
+      - RecipesResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ParentId: !Ref "RecipesResource"
+      PathPart: "{id}"
+
+  RecipeModel:
+    Type: 'AWS::ApiGateway::Model'
+    Properties:
+      RestApiId: !Ref RestApi
+      ContentType: application/json
+      Description: Schema for a single recipe
+      Name: Recipe
+      Schema:
+        $schema: 'http://json-schema.org/draft-04/schema#'
+        title: Recipe
+        type: object
+        properties:
+          id:
+            description: Identifier of a recipe.
+            type: string
+          type:
+            description: Type of a recipe.
+            type: string
+            enum: [cooking, baking]
+          title:
+            description: Tile of a recipe.
+            type: string
+          ingredients:
+            description: List of recipe ingredients.
+            type: string
+          description:
+            description: Insructions to prepare a meal or cake.
+            type: string
+          createdat:
+            description: Date and time a recipe has been created.
+            type: string
+            format: date-time
+  
+  NewRecipeModel:
+    Type: 'AWS::ApiGateway::Model'
+    Properties:
+      RestApiId: !Ref RestApi
+      ContentType: application/json
+      Description: Schema to creata a new recipe
+      Name: NewRecipe
+      Schema:
+        $schema: 'http://json-schema.org/draft-04/schema#'
+        title: New Recipe
+        type: object
+        properties:
+          type:
+            description: Type of a recipe.
+            type: string
+            enum: [cooking, baking]
+          title:
+            description: Tile of a recipe.
+            type: string
+          ingredients:
+            description: List of recipe ingredients.
+            type: string
+          description:
+            description: Insructions to prepare a meal or cake.
+            type: string
+
+  RecipeListModel:
+    Type: 'AWS::ApiGateway::Model'
+    DependsOn:
+      - RestApi
+    Properties:
+      RestApiId: !Ref RestApi
+      ContentType: application/json
+      Description: Schema for a list of recipes
+      Name: RecipeList
+      Schema:
+        $schema: 'http://json-schema.org/draft-04/schema#'
+        title: Recipe List
+        type: array
+        items:
+          $ref: !Join 
+          - ""
+          - - "https://apigateway.amazonaws.com/restapis/"
+            - !Ref RestApi
+            - "/models/"
+            - !Ref RecipeModel
+
+  RecipesGetValidator:
+    Type: AWS::ApiGateway::RequestValidator
+    Properties: 
+      Name: RecipesGetValidator
+      RestApiId: !Ref RestApi
+      ValidateRequestBody: false
+      ValidateRequestParameters: true
+
+  RecipesGet:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipesResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipesResource"
+      HttpMethod: "GET"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      RequestValidatorId: !Ref RecipesGetValidator
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+      RequestParameters:
+        method.request.querystring.recipetype: true 
+      MethodResponses:
+        - ResponseModels:
+            "application/json": !Ref RecipeListModel
+          StatusCode: 200
+
+  RecipesPost:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipesResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipesResource"
+      HttpMethod: "POST"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+      MethodResponses:
+          - ResponseModels:
+              "application/json": !Ref RecipeModel
+            StatusCode: 200
+
+  RecipesOptions:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipesResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipesResource"
+      HttpMethod: "OPTIONS"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "MOCK"
+        PassthroughBehavior: "WHEN_NO_MATCH"
+        RequestTemplates: 
+          application/json: "{\"statusCode\": 200}"
+        IntegrationResponses: 
+          - ResponseTemplates:
+              "application/json": "{}"
+            ResponseParameters: 
+              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              "method.response.header.Access-Control-Allow-Methods" : "'GET,POST,OPTIONS'"
+              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+            StatusCode: 200
+      MethodResponses:
+        - ResponseModels:
+            "application/json": "Empty"
+          ResponseParameters: 
+            "method.response.header.Access-Control-Allow-Headers": false
+            "method.response.header.Access-Control-Allow-Methods": false
+            "method.response.header.Access-Control-Allow-Origin": false
+          StatusCode: 200
+
+  RecipeGet:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "GET"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+        MethodResponses:
+          - ResponseModels:
+              "application/json": !Ref RecipeModel
+
+  RecipePut:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "PUT"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+        MethodResponses:
+          - ResponseModels:
+              "application/json": !Ref RecipeModel
+
+  RecipeGet:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "GET"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+        MethodResponses:
+          - ResponseModels:
+              "application/json": !Ref RecipeModel
+  
+  RecipeGet:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "GET"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+        MethodResponses:
+          - ResponseModels:
+              "application/json": !Ref RecipeModel
+  
+  RecipeDelete:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "DELETE"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "AWS_PROXY"
+        IntegrationHttpMethod: "POST"
+        Uri: !Join 
+          - ""
+          - - "arn:aws:apigateway:"
+            - !Ref "AWS::Region"
+            - ":lambda:path/2015-03-31/functions/"
+            - !Ref "FunctionArn"
+            - "/invocations"    
+        PassthroughBehavior: "NEVER"
+
+  RecipeOptions:
+    Type: AWS::ApiGateway::Method
+    DependsOn:
+      - RecipeResource
+    Properties:
+      RestApiId: !Ref "RestApi"
+      ResourceId: !Ref "RecipeResource"
+      HttpMethod: "OPTIONS"
+      AuthorizationType: "AWS_IAM"
+      ApiKeyRequired: true
+      Integration:
+        Type: "MOCK"
+        PassthroughBehavior: "WHEN_NO_MATCH"
+        RequestTemplates: 
+          application/json: "{\"statusCode\": 200}"
+        IntegrationResponses: 
+          - ResponseTemplates:
+              "application/json": "{}"
+            ResponseParameters: 
+              "method.response.header.Access-Control-Allow-Headers" : "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'"
+              "method.response.header.Access-Control-Allow-Methods" : "'GET,POST,OPTIONS'"
+              "method.response.header.Access-Control-Allow-Origin" : "'*'"
+            StatusCode: 200
+      MethodResponses:
+        - ResponseModels:
+            "application/json": "Empty"
+          ResponseParameters: 
+            "method.response.header.Access-Control-Allow-Headers": false
+            "method.response.header.Access-Control-Allow-Methods": false
+            "method.response.header.Access-Control-Allow-Origin": false
+          StatusCode: 200
+  
