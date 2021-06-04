@@ -1,0 +1,25 @@
+variables:
+  AWS_REGION: eu-central-1
+  ECR_IMAGE: "/lambda/recipemananger:latest"
+  LAMBDA_FUNCTION: RecipeMananger
+  TZN_CONFIGFILE: "gitlab.config"
+  
+stages:
+  - test
+  - build
+  - deploy
+  - release
+
+include:
+  - project: 'tommzn-solutions-dev/devops/ci-template'
+    ref: master
+    file: '/golang/tests_with_local_dynamodb.yml'
+  - project: 'tommzn-solutions-dev/devops/ci-template'
+    ref: master
+    file: '/golang/build_binary.yml'
+  - project: 'tommzn-solutions-dev/devops/ci-template'
+    ref: master
+    file: '/docker/ecr.build.image.yml'
+  - project: 'tommzn-solutions-dev/devops/ci-template'
+    ref: master
+    file: '/aws/lambda.ecr.deploy.yml'
