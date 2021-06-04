@@ -2,8 +2,6 @@
 log:
   type: local
   loglevel: debug
-  namespace: recipemanager-lambda
-  batchsize: 5
   
 aws:
   dynamodb:
