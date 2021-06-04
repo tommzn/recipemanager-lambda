@@ -5,4 +5,4 @@
 Provices an adapater which handles requests from API Gateway to manage life circle of receipes.
 
 # API Contract
-API contract is availabe as ![OpenApi spec](https://github.com/tommzn/recipemanager-lambda/blob/main/aws/openapi.yml).
+API contract is availabe as [OpenApi Spec](https://github.com/tommzn/recipemanager-lambda/blob/main/aws/openapi.yml).
