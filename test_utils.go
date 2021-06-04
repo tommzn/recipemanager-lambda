@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -15,7 +16,11 @@ import (
 
 // loadConfigForTest loads test config.
 func loadConfigForTest() config.Config {
-	configFile := "testconfig.yml"
+
+	configFile, ok := os.LookupEnv("CONFIG_FILE")
+	if !ok {
+		configFile = "testconfig.yml"
+	}
 	configLoader := config.NewFileConfigSource(&configFile)
 	config, _ := configLoader.Load()
 	return config
