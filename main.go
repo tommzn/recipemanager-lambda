@@ -30,7 +30,10 @@ func bootstrap(conf config.Config) LambdaRequestHandler {
 // loadConfig from config file.
 func loadConfig() config.Config {
 	configLoader := config.NewConfigSource()
-	config, _ := configLoader.Load()
+	config, err := configLoader.Load()
+	if err != nil {
+		panic(err)
+	}
 	return config
 }
 
