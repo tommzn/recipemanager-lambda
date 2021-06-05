@@ -108,6 +108,11 @@ func (suite *IntegrationTestSuite) TestCrudActions() {
 
 }
 
+func (suite *IntegrationTestSuite) TestLoadConfig() {
+
+	suite.NotNil(loadConfig())
+}
+
 // Assert a successful response status between 200 and 299.
 func (suite *IntegrationTestSuite) assertSuccessfulResponse(response events.APIGatewayProxyResponse, err error) {
 	suite.Nil(err)
