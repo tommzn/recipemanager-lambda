@@ -29,12 +29,24 @@ func bootstrap(conf config.Config) LambdaRequestHandler {
 
 // loadConfig from config file.
 func loadConfig() config.Config {
-	configLoader := config.NewConfigSource()
-	config, err := configLoader.Load()
+
+	var configSource config.ConfigSource
+	var conf config.Config
+	var err error
+
+	// Try to create a S3 config source, first.
+	configSource, err = config.NewS3ConfigSourceFromEnv()
+
+	// If it fails use file config source as fallback.
+	if err != nil {
+		configSource = config.NewConfigSource()
+	}
+
+	conf, err = configSource.Load()
 	if err != nil {
 		panic(err)
 	}
-	return config
+	return conf
 }
 
 // newSecretsManager retruns a new secrets manager from passed config.
