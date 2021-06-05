@@ -60,6 +60,7 @@ jobs:
       - name: Build Image
         uses: docker/build-push-action@v2
         with:
+          context: .
           push: true
           tags: |
             docker.pkg.github.com/${{ github.repository }}/amd64:${{ github.sha }}
