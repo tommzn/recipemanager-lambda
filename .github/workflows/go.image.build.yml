@@ -6,10 +6,7 @@ on:
 jobs:
   go-build:
     name: Go Test & Binary Build
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -45,10 +42,7 @@ jobs:
   image-build:
     name: Build and Deploy Docker Image
     needs: [go-build]
-    strategy:
-      matrix:
-        platform: [ubuntu-latest]
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
