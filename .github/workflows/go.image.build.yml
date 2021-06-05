@@ -1,4 +1,4 @@
-name: Go Package Release
+name: Image Build
 on:
   push:
     branches:
