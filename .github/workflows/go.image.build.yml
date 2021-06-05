@@ -41,3 +41,5 @@ jobs:
           name: build_artifact_bin
           path: build_artifact_bin
           retention-days: 1
+      - name: Show AWS CLI Version
+        run: aws --version
