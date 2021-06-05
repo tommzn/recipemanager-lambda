@@ -30,19 +30,12 @@ func bootstrap(conf config.Config) LambdaRequestHandler {
 // loadConfig from config file.
 func loadConfig() config.Config {
 
-	var configSource config.ConfigSource
-	var conf config.Config
-	var err error
-
-	// Try to create a S3 config source, first.
-	configSource, err = config.NewS3ConfigSourceFromEnv()
-
-	// If it fails use file config source as fallback.
+	configSource, err := config.NewS3ConfigSourceFromEnv()
 	if err != nil {
-		configSource = config.NewConfigSource()
+		panic(err)
 	}
 
-	conf, err = configSource.Load()
+	conf, err := configSource.Load()
 	if err != nil {
 		panic(err)
 	}
