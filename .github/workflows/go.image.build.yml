@@ -1,0 +1,31 @@
+name: Go Package Release
+on:
+  push:
+    branches:
+      - main
+jobs:
+  go-build:
+    name: Go Test & Binary Build
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get Go version
+        run: echo "goversion=`egrep -i '^go [1-2][.][0-9]+$' go.mod | sed 's/go //' | sed 's/$/.x/'`" >> $GITHUB_ENV
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.goversion }}
+      - name: Run tests
+        run: go test -v  -covermode=count ./...
+      - name: Build Binary
+        run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -v -o build_artifact_bin
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build_artifact_bin
+          path: build_artifact_bin
+          retention-days: 1
