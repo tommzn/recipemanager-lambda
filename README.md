@@ -1,5 +1,6 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/tommzn/recipemanager-lambda)
 [![Go Report Card](https://goreportcard.com/badge/github.com/tommzn/recipemanager-lambda)](https://goreportcard.com/report/github.com/tommzn/recipemanager-lambda)
+[![Actions Status](https://github.com/tommzn/recipemanager-lambda/actions/workflows/go.image.build.yml/badge.svg)](https://github.com/tommzn/recipemanager-lambda/actions)
 
 # Recipe Board - Lambda Recipe Manager
 Provices an adapater which handles requests from API Gateway to manage life circle of receipes.
