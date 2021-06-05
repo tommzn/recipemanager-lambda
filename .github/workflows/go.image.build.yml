@@ -62,7 +62,7 @@ jobs:
         with:
           push: true
           tags: |
-            docker.pkg.github.com/${{ github.repository }}/arm64:${{ github.sha }}
-            docker.pkg.github.com/${{ github.repository }}/arm64:latest
+            docker.pkg.github.com/${{ github.repository }}/amd64:${{ github.sha }}
+            docker.pkg.github.com/${{ github.repository }}/amd64:latest
   
         
