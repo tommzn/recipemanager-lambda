@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -110,6 +111,9 @@ func (suite *IntegrationTestSuite) TestCrudActions() {
 
 func (suite *IntegrationTestSuite) TestLoadConfig() {
 
+	if !runS3ConfigLoadTest() {
+		suite.T().Skip("Skip config load test, missing env: AWS_REGION, GO_CONFIG_S3_BUCKETor GO_CONFIG_S3_KEY")
+	}
 	suite.NotNil(loadConfig())
 }
 
@@ -124,4 +128,22 @@ func (suite *IntegrationTestSuite) recipeAsJson(recipe model.Recipe) *string {
 	suite.Nil(err)
 	jsonString := string(recipeJson)
 	return &jsonString
+}
+
+// runS3ConfigLoadTest will have a look if env variables
+// for S3 config load test are available.
+func runS3ConfigLoadTest() bool {
+
+	if _, ok := os.LookupEnv("AWS_REGION"); !ok {
+		return false
+	}
+
+	if _, ok := os.LookupEnv("GO_CONFIG_S3_BUCKET"); !ok {
+		return false
+	}
+
+	if _, ok := os.LookupEnv("GO_CONFIG_S3_KEY"); !ok {
+		return false
+	}
+	return true
 }
