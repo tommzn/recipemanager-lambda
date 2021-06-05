@@ -10,7 +10,7 @@ require (
 	github.com/stretchr/testify v1.7.0
 	github.com/tommzn/aws-dynamodb v1.0.6 // indirect
 	github.com/tommzn/aws-dynamodb/testing v1.0.1
-	github.com/tommzn/go-config v1.0.4
+	github.com/tommzn/go-config v1.0.5
 	github.com/tommzn/go-log v1.0.1
 	github.com/tommzn/go-secrets v1.0.0
 	github.com/tommzn/go-utils v1.0.1
