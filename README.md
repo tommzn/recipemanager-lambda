@@ -6,3 +6,6 @@ Provices an adapater which handles requests from API Gateway to manage life circ
 
 # API Contract
 API contract is availabe as [OpenApi Spec](https://github.com/tommzn/recipemanager-lambda/blob/main/aws/openapi.yml).
+
+# Projects Docs
+Projects documentations is available at repo [Wiki](https://github.com/tommzn/recipeboard-core/wiki).
