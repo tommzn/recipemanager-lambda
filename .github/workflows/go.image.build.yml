@@ -20,6 +20,9 @@ jobs:
         with:
           go-version: ${{ env.goversion }}
       - name: Run tests
+        env:
+          AWS_ACCESS_KEY_ID: xxx # Dummy values to avoid NoCredentialProviders error
+          AWS_SECRET_ACCESS_KEY: xxx # Dummy values to avoid NoCredentialProviders error
         run: go test -v  -covermode=count ./...
       - name: Build Binary
         run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -v -o build_artifact_bin
