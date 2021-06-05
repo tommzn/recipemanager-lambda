@@ -41,5 +41,31 @@ jobs:
           name: build_artifact_bin
           path: build_artifact_bin
           retention-days: 1
-      - name: Show AWS CLI Version
-        run: aws --version
+      
+  image-build:
+    name: Build and Deploy Docker Image
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build_artifact_bin
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v1
+        with:
+          registry: docker.pkg.github.com
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Image
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: |
+            docker.pkg.github.com/${{ github.repository }}/arm64:${{ github.sha }}
+            docker.pkg.github.com/${{ github.repository }}/arm64:${{ github.ref }}
+  
+        
