@@ -2,8 +2,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/aws/aws-lambda-go/lambda"
 	config "github.com/tommzn/go-config"
 	log "github.com/tommzn/go-log"
@@ -13,9 +11,7 @@ import (
 // Bootstrap and run a Lambda handler for API Gateway requests.
 func main() {
 
-	fmt.Println("Run RecipeManager Lambda function...")
 	handler := bootstrap(nil)
-	fmt.Println("Bootstrapped!")
 	lambda.Start(handler.handle)
 
 }
@@ -23,9 +19,7 @@ func main() {
 // bootstrap creates a new Lambda request handler.
 func bootstrap(conf config.Config) LambdaRequestHandler {
 
-	fmt.Println("Start Bootstrap")
 	if conf == nil {
-		fmt.Println("Load Config")
 		conf = loadConfig()
 	}
 	secretsmanager := newSecretsManager()
@@ -37,9 +31,7 @@ func bootstrap(conf config.Config) LambdaRequestHandler {
 // loadConfig from config file.
 func loadConfig() config.Config {
 
-	fmt.Println("Ceate S3 Config, Start")
 	configSource, err := config.NewS3ConfigSourceFromEnv()
-	fmt.Println("Ceate S3 Config, End")
 	if err != nil {
 		panic(err)
 	}
