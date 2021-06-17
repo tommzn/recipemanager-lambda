@@ -104,9 +104,12 @@ func (suite *IntegrationTestSuite) TestCrudActions() {
 	suite.assertSuccessfulResponse(response5, err5)
 
 	request5_1 := apiGatewayRequestWithQueryParamForTest(http.MethodGet, "recipetype", "baking")
-	_, err5_1 := suite.handler.handle(context.Background(), request5_1)
-	suite.NotNil(err5_1)
+	response5_1, err5_1 := suite.handler.handle(context.Background(), request5_1)
+	suite.assertSuccessfulResponse(response5_1, err5_1)
 
+	responseRecipes5_2, err5_2 := getRecipeListFromResponse(response5_1)
+	suite.Nil(err5_2)
+	suite.Len(responseRecipes5_2, 0)
 }
 
 func (suite *IntegrationTestSuite) TestLoadConfig() {

@@ -14,7 +14,7 @@ require (
 	github.com/tommzn/go-log v1.0.2
 	github.com/tommzn/go-secrets v1.0.0
 	github.com/tommzn/go-utils v1.0.1
-	github.com/tommzn/recipeboard-core v1.0.1
+	github.com/tommzn/recipeboard-core v1.0.2
 	github.com/tommzn/recipeboard-core/mock v1.0.0
 	github.com/tommzn/recipeboard-core/model v1.0.0
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect

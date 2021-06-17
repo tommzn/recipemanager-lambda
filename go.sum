@@ -364,6 +364,8 @@ github.com/tommzn/recipeboard-core v1.0.0 h1:yFQnDr109fqxlOR6RfdWqreTAQ45/uddbHW
 github.com/tommzn/recipeboard-core v1.0.0/go.mod h1:/6opFMholly5RJdEgS30QEeebHCyJG5ngiAoeSJS9rQ=
 github.com/tommzn/recipeboard-core v1.0.1 h1:kfrYAwODjtAHyrBgyXdM7efxf7LpDJ3BVzJi2YNE+DY=
 github.com/tommzn/recipeboard-core v1.0.1/go.mod h1:/6opFMholly5RJdEgS30QEeebHCyJG5ngiAoeSJS9rQ=
+github.com/tommzn/recipeboard-core v1.0.2 h1:C7iw8Lg0vFGjZAU/3QcbAhOfQf4OIJPrCvWHO+CGzEI=
+github.com/tommzn/recipeboard-core v1.0.2/go.mod h1:/6opFMholly5RJdEgS30QEeebHCyJG5ngiAoeSJS9rQ=
 github.com/tommzn/recipeboard-core/mock v0.2.7 h1:vr0kZssXhdFr1rz+a/toflHhBHJDfges7VTHDBHIzyk=
 github.com/tommzn/recipeboard-core/mock v0.2.7/go.mod h1:3zV5TNs02cYViO944i3rP52QYFy97wY4I02qsro1qH4=
 github.com/tommzn/recipeboard-core/mock v0.2.13 h1:x8Zwv3WhZbYbyb2RVkQZ9gb5JNvejj4Li7DlljdjqHs=
