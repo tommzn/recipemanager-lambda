@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	model "github.com/tommzn/recipeboard-core/model"
@@ -137,6 +138,7 @@ func unmarshalFromRequestBody(requestBody string) (*model.Recipe, error) {
 
 // marshalRecipe a single recipe to JSON string.
 func marshalRecipe(recipe model.Recipe) (*string, error) {
+	recipe.CreatedAt = recipe.CreatedAt.Round(1 * time.Second)
 	b, err := json.Marshal(recipe)
 	jsonStr := string(b)
 	return &jsonStr, err
@@ -144,6 +146,9 @@ func marshalRecipe(recipe model.Recipe) (*string, error) {
 
 // marshalRecipes returns JSON string of passed recipes.
 func marshalRecipes(recipes []model.Recipe) (*string, error) {
+	for idx, recipe := range recipes {
+		recipes[idx].CreatedAt = recipe.CreatedAt.Round(1 * time.Second)
+	}
 	b, err := json.Marshal(recipes)
 	jsonStr := string(b)
 	return &jsonStr, err
